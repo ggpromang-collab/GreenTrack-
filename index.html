@@ -636,7 +636,7 @@
     var isSelectMode = true;
     var isRegisterMode = false;
 
-    // Lógica de Autenticação
+// Lógica de Autenticação
     function checkAuth() {
       var currentUser = localStorage.getItem('gestor_greens_user');
       if (currentUser) {
@@ -666,30 +666,29 @@
       }
     }
 
-    function handleAuth(e) {
+    async function handleAuth(e) {
       e.preventDefault();
       var email = document.getElementById('auth-email').value.trim();
       var password = document.getElementById('auth-password').value;
 
       if (!email || !password) return;
 
-      var users = JSON.parse(localStorage.getItem('gestor_greens_users') || '{}');
-
       if (isRegisterMode) {
-        if (users[email]) {
-          alert('Este e-mail já está cadastrado!');
-          return;
-        }
-        users[email] = password;
-        localStorage.setItem('gestor_greens_users', JSON.stringify(users));
-        localStorage.setItem('gestor_greens_user', email);
-        checkAuth();
-      } else {
-        if (users[email] && users[email] === password) {
+        const { data, error } = await _supabase.auth.signUp({ email, password });
+        if (error) {
+          alert("Erro no cadastro: " + error.message);
+        } else {
+          alert("Cadastro realizado com sucesso! Seus dados já estão no Supabase.");
           localStorage.setItem('gestor_greens_user', email);
           checkAuth();
+        }
+      } else {
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          alert("E-mail ou senha incorretos!");
         } else {
-          alert('E-mail ou senha incorretos!');
+          localStorage.setItem('gestor_greens_user', email);
+          checkAuth();
         }
       }
     }
