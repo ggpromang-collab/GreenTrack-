@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gestor de Greens - Controle de Banca e Lucros</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080c14;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --input-bg: #0d1322;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --green-glow: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.15);
+      --red-glow: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.15);
+      --yellow-glow: #f59e0b;
+      --yellow-bg: rgba(245, 158, 11, 0.15);
+      --blue-accent: #3b82f6;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Tela de Login */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .auth-card h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .auth-card h2 span { color: var(--green-glow); }
+
+    .container { max-width: 1200px; margin: 0 auto; display: none; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-area h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-area h1 span { color: var(--green-glow); }
+
+    .logo-area p {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: #1e293b;
+      color: var(--text-primary);
+      border: 1px solid var(--card-border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { background-color: #2d3d5a; }
+    .btn-green { background-color: var(--green-glow); color: #022c22; border: none; }
+    .btn-green:hover { background-color: #059669; color: white; }
+    .btn-red { background-color: rgba(239, 68, 68, 0.2); color: var(--red-glow); border: 1px solid var(--red-glow); }
+    .btn-red:hover { background-color: var(--red-glow); color: white; }
+
+    .bankroll-bar {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(59, 130, 246, 0.12));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .bankroll-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bankroll-info span { font-size: 0.85rem; color: var(--text-secondary); }
+    .bankroll-info strong { font-size: 1.2rem; color: var(--text-primary); }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card .title {
+      font-size: 0.725rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .card .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .card .subtext {
+      font-size: 0.775rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .value.green { color: var(--green-glow); }
+    .value.red { color: var(--red-glow); }
+    .value.blue { color: var(--blue-accent); }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-section, .table-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: var(--input-bg);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 12px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .mode-btn.active {
+      background: var(--card-bg);
+      color: var(--green-glow);
+    }
+
+    .form-group { margin-bottom: 12px; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--green-glow);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--green-glow);
+      color: #022c22;
+      font-weight: 800;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-submit:hover { background-color: #059669; color: #fff; }
+
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 4px;
+      background-color: var(--bg-dark);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .filter-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    .table-container { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.825rem;
+    }
+
+    th {
+      background-color: rgba(255, 255, 255, 0.02);
+      color: var(--text-secondary);
+      font-weight: 700;
+      padding: 10px;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 0.675rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid var(--card-border);
+      vertical-align: middle;
+    }
+
+    tr:hover td { background-color: rgba(255, 255, 255, 0.015); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+    }
+
+    .badge.green { background-color: var(--green-bg); color: var(--green-glow); }
+    .badge.red { background-color: var(--red-bg); color: var(--red-glow); }
+    .badge.pending { background-color: var(--yellow-bg); color: var(--yellow-glow); }
+    .badge.refund { background-color: rgba(148, 163, 184, 0.15); color: var(--text-secondary); }
+
+    .btn-del {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 1rem;
+    }
+
+    .btn-del:hover { color: var(--red-glow); }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 380px;
+      padding: 20px;
+    }
+
+    .modal h3 { margin-bottom: 10px; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Tela de Login / Cadastro -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <h2>🟢 Gestor de <span>Greens</span></h2>
+      <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 20px;" id="auth-subtitle">Entre para gerenciar suas apostas</p>
+
+      <form id="auth-form" onsubmit="handleAuth(event)">
+        <div class="form-group">
+          <label for="auth-email">E-mail</label>
+          <input type="email" id="auth-email" placeholder="seu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="auth-password">Senha</label>
+          <input type="password" id="auth-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit" id="auth-btn-submit">Entrar</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="#" onclick="toggleAuthMode(event)" id="auth-toggle-btn" style="color: var(--green-glow); font-size: 0.8rem; text-decoration: none; font-weight: 600;">Criar uma nova conta</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="app-container">
+    <header>
+      <div class="logo-area">
+        <h1>🟢 Gestor de <span>Greens</span></h1>
+        <p>Controle de Banca e Backup de Histórico</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn" onclick="exportBackup()">📥 Baixar Backup</button>
+        <button type="button" class="btn" onclick="triggerImport()">📤 Restaurar</button>
+        <input type="file" id="import-file-input" style="display:none;" accept=".json" onchange="importBackup(event)">
+        <button type="button" class="btn btn-green" onclick="openBankrollModal()">💰 Banca Inicial</button>
+        <button type="button" class="btn btn-red" onclick="openResetModal()">🔄 Zerar</button>
+        <button type="button" class="btn btn-red" onclick="handleLogout()">🚪 Sair</button>
+      </div>
+    </header>
+
+    <div class="bankroll-bar">
+      <div class="bankroll-info">
+        <span>Banca Inicial:</span>
+        <strong id="display-initial-bankroll">R$ 0,00</strong>
+      </div>
+      <div class="bankroll-info">
+        <span>Banca Total Atual:</span>
+        <strong id="display-total-bankroll" style="color: var(--green-glow);">R$ 0,00</strong>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="title">Lucro Líquido Acumulado</div>
+        <div class="value green" id="card-profit">R$ 0,00</div>
+        <div class="subtext" id="card-bankroll-growth">🚀 Crescimento da Banca: +0.0%</div>
+      </div>
+
+      <div class="card">
+        <div class="title">Retorno s/ Investimento (ROI)</div>
+        <div class="value blue" id="card-roi">+0.0%</div>
+        <div class="subtext" id="card-staked-sub">Total Apostado: R$ 0,00</div>
+      </div>
+
+      <div class="card">
+        <div class="title">Taxa de Acerto (Winrate)</div>
+        <div class="value green" id="card-winrate">0%</div>
+        <div class="subtext" id="card-greens-reds">0 Greens / 0 Reds</div>
+      </div>
+
+      <div class="card">
+        <div class="title">Média de Odds & Apostas</div>
+        <div class="value" id="card-avg-odd" style="color: var(--text-primary);">@ 0.00</div>
+        <div class="subtext" id="card-total-bets">0 apostas cadastradas</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="form-section">
+        <div style="font-weight: 700; margin-bottom: 12px;">➕ Nova Aposta</div>
+        
+        <div class="mode-toggle">
+          <button type="button" id="btn-mode-select" class="mode-btn active" onclick="setSelectMode(true)">🏆 Escolher Times</button>
+          <button type="button" id="btn-mode-manual" class="mode-btn" onclick="setSelectMode(false)">✍️ Digitar Livremente</button>
+        </div>
+
+        <form id="bet-form" onsubmit="handleAddBet(event)">
+          <div class="form-group">
+            <label for="bet-date">Data</label>
+            <input type="date" id="bet-date" required>
+          </div>
+
+          <div id="selector-container">
+            <div class="form-group">
+              <label for="league-select">Campeonato</label>
+              <select id="league-select" onchange="onLeagueChange()">
+                <option value="">-- Selecione o Campeonato --</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="home-team-select">Mandante (Casa)</label>
+                <select id="home-team-select" onchange="updateEventFromSelection()">
+                  <option value="">-- Time A --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="away-team-select">Visitante (Fora)</label>
+                <select id="away-team-select" onchange="updateEventFromSelection()">
+                  <option value="">-- Time B --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bet-event">Jogo / Evento</label>
+            <input type="text" id="bet-event" placeholder="Ex: Flamengo vs Palmeiras" required readonly>
+          </div>
+
+          <div class="form-group">
+            <label for="bet-market">Aposta / Seleção</label>
+            <textarea id="bet-market" rows="2" placeholder="Ex: Vitória do Real Madrid + Ambas Marcam" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bet-odd">Odd</label>
+              <input type="number" id="bet-odd" step="0.01" min="1.01" placeholder="1.80" required>
+            </div>
+            <div class="form-group">
+              <label for="bet-stake">Valor Apostado (R$)</label>
+              <input type="number" id="bet-stake" step="0.01" min="0.1" placeholder="10.00" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bet-status">Resultado</label>
+            <select id="bet-status">
+              <option value="GREEN" selected>🟢 GREEN (Ganhou)</option>
+              <option value="RED">🔴 RED (Perdeu)</option>
+              <option value="PENDING">🟡 PENDENTE (Em andamento)</option>
+              <option value="REFUND">⚪ ANULADA / DEVOLVIDA</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-submit">Salvar Aposta</button>
+        </form>
+      </div>
+
+      <div class="table-section">
+        <div class="filter-bar">
+          <div class="filter-buttons">
+            <button type="button" class="filter-btn active" onclick="filterBets('ALL', this)">Todas</button>
+            <button type="button" class="filter-btn" onclick="filterBets('GREEN', this)">Greens</button>
+            <button type="button" class="filter-btn" onclick="filterBets('RED', this)">Reds</button>
+            <button type="button" class="filter-btn" onclick="filterBets('PENDING', this)">Pendentes</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Jogo / Mercado</th>
+                <th>Odd</th>
+                <th>Valor</th>
+                <th>Lucro (R$)</th>
+                <th>Lucro (%)</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="bets-table-body">
+            </tbody>
+          </table>
+          <div id="empty-state" class="empty-state" style="display:none;">
+            Nenhuma aposta salva no histórico.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="bankroll-modal">
+    <div class="modal">
+      <h3>💰 Definir Banca Inicial</h3>
+      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 14px;">
+        Digite o valor inicial da sua banca para calcular o crescimento acumulado em %:
+      </p>
+      <div class="form-group">
+        <label>Valor Inicial (R$)</label>
+        <input type="number" id="modal-bankroll-input" step="0.01" placeholder="Ex: 100.00">
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+        <button type="button" class="btn" onclick="closeBankrollModal()">Cancelar</button>
+        <button type="button" class="btn btn-green" onclick="saveInitialBankroll()">Salvar Banca</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="reset-modal">
+    <div class="modal">
+      <h3 style="color: var(--red-glow);">⚠️ Zerar Todos os Dados?</h3>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+        Esta ação vai apagar permanentemente todas as apostas, lucros e o valor da banca inicial.
+      </p>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button type="button" class="btn" onclick="closeResetModal()">Cancelar</button>
+        <button type="button" class="btn btn-red" onclick="executeReset()">Sim, Zerar Tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var LEAGUES = {
+      "🇧🇷 Brasileirão Série A (2026)": [
+        "Athletico-PR", "Atlético-MG", "Bahia", "Botafogo", "Ceará",
+        "Corinthians", "Cruzeiro", "Flamengo", "Fluminense", "Fortaleza",
+        "Grêmio", "Internacional", "Juventude", "Mirassol", "Palmeiras",
+        "Red Bull Bragantino", "Santos", "São Paulo", "Sport", "Vasco da Gama"
+      ],
+      "🇪🇸 La Liga (Espanha)": [
+        "Alavés", "Athletic Bilbao", "Atlético de Madrid", "Barcelona", "Celta de Vigo",
+        "Espanyol", "Getafe", "Girona", "Las Palmas", "Leganés",
+        "Mallorca", "Osasuna", "Rayo Vallecano", "Real Betis", "Real Madrid",
+        "Real Sociedad", "Sevilla", "Valencia", "Valladolid", "Villarreal"
+      ],
+      "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League (Inglaterra)": [
+        "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
+        "Chelsea", "Crystal Palace", "Everton", "Fulham", "Ipswich Town",
+        "Leicester City", "Liverpool", "Manchester City", "Manchester United", "Newcastle United",
+        "Nottingham Forest", "Southampton", "Tottenham Hotspur", "West Ham", "Wolverhampton"
+      ],
+      "🇮🇹 Serie A (Itália)": [
+        "Atalanta", "Bologna", "Cagliari", "Como", "Empoli",
+        "Fiorentina", "Genoa", "Inter de Milão", "Juventus", "Lazio",
+        "Lecce", "Milan", "Monza", "Napoli", "Parma",
+        "Roma", "Torino", "Udinese", "Venezia", "Verona"
+      ]
+    };
+
+    var initialBankroll = 0.00;
+    var bets = [];
+    var currentFilter = 'ALL';
+    var isSelectMode = true;
+    var isRegisterMode = false;
+
+    // Lógica de Autenticação
+    function checkAuth() {
+      var currentUser = localStorage.getItem('gestor_greens_user');
+      if (currentUser) {
+        document.getElementById('auth-overlay').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+      } else {
+        document.getElementById('auth-overlay').style.display = 'flex';
+        document.getElementById('app-container').style.display = 'none';
+      }
+    }
+
+    function toggleAuthMode(e) {
+      e.preventDefault();
+      isRegisterMode = !isRegisterMode;
+      var subtitle = document.getElementById('auth-subtitle');
+      var btn = document.getElementById('auth-btn-submit');
+      var toggleBtn = document.getElementById('auth-toggle-btn');
+
+      if (isRegisterMode) {
+        subtitle.textContent = 'Crie sua conta para começar';
+        btn.textContent = 'Cadastrar';
+        toggleBtn.textContent = 'Já tem uma conta? Faça login';
+      } else {
+        subtitle.textContent = 'Entre para gerenciar suas apostas';
+        btn.textContent = 'Entrar';
+        toggleBtn.textContent = 'Criar uma nova conta';
+      }
+    }
+
+    function handleAuth(e) {
+      e.preventDefault();
+      var email = document.getElementById('auth-email').value.trim();
+      var password = document.getElementById('auth-password').value;
+
+      if (!email || !password) return;
+
+      var users = JSON.parse(localStorage.getItem('gestor_greens_users') || '{}');
+
+      if (isRegisterMode) {
+        if (users[email]) {
+          alert('Este e-mail já está cadastrado!');
+          return;
+        }
+        users[email] = password;
+        localStorage.setItem('gestor_greens_users', JSON.stringify(users));
+        localStorage.setItem('gestor_greens_user', email);
+        checkAuth();
+      } else {
+        if (users[email] && users[email] === password) {
+          localStorage.setItem('gestor_greens_user', email);
+          checkAuth();
+        } else {
+          alert('E-mail ou senha incorretos!');
+        }
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('gestor_greens_user');
+      checkAuth();
+    }
+
+    function safeStorageSave() {
+      try {
+        localStorage.setItem('gestor_greens_bets_v6', JSON.stringify(bets));
+        localStorage.setItem('gestor_greens_bankroll_v6', initialBankroll.toString());
+      } catch (e) {}
+    }
+
+    function safeStorageLoad() {
+      try {
+        var savedBets = localStorage.getItem('gestor_greens_bets_v6');
+        var savedBankroll = localStorage.getItem('gestor_greens_bankroll_v6');
+        
+        if (savedBankroll !== null && savedBankroll !== '') {
+          initialBankroll = parseFloat(savedBankroll) || 0.00;
+        } else {
+          initialBankroll = 0.00;
+        }
+
+        if (savedBets !== null && savedBets !== '') {
+          bets = JSON.parse(savedBets) || [];
+        } else {
+          bets = [];
+        }
+      } catch (e) {
+        bets = [];
+        initialBankroll = 0.00;
+      }
+    }
+
+    function exportBackup() {
+      var data = {
+        initialBankroll: initialBankroll,
+        bets: bets,
+        exportedAt: new Date().toISOString()
+      };
+      var str = JSON.stringify(data, null, 2);
+      var blob = new Blob([str], { type: 'application/octet-stream' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'backup_greens_' + new Date().toISOString().split('T')[0] + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function triggerImport() {
+      document.getElementById('import-file-input').click();
+    }
+
+    function importBackup(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+
+      var reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          var imported = JSON.parse(evt.target.result);
+          if (imported && Array.isArray(imported.bets)) {
+            bets = imported.bets;
+            initialBankroll = parseFloat(imported.initialBankroll) || 0;
+            safeStorageSave();
+            updateDashboard();
+            renderTable();
+            alert('✅ Backup restaurado com sucesso!');
+          } else {
+            alert('⚠️ Arquivo de backup inválido.');
+          }
+        } catch (err) {
+          alert('❌ Erro ao ler arquivo de backup.');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    function fmtBRL(val) {
+      var num = parseFloat(val) || 0;
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+    }
+
+    function fmtPercent(val) {
+      var num = parseFloat(val) || 0;
+      return (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuth();
+      document.getElementById('bet-date').value = new Date().toISOString().split('T')[0];
+      initLeagueOptions();
+      safeStorageLoad();
+      updateDashboard();
+      renderTable();
+    });
+
+    function initLeagueOptions() {
+      var leagueSelect = document.getElementById('league-select');
+      leagueSelect.innerHTML = '<option value="">-- Selecione o Campeonato --</option>';
+      
+      for (var l in LEAGUES) {
+        var opt = document.createElement('option');
+        opt.value = l;
+        opt.textContent = l;
+        leagueSelect.appendChild(opt);
+      }
+    }
+
+    function onLeagueChange() {
+      var leagueSelect = document.getElementById('league-select');
+      var selectedLeague = leagueSelect.value;
+      
+      var homeSelect = document.getElementById('home-team-select');
+      var awaySelect = document.getElementById('away-team-select');
+
+      homeSelect.innerHTML = '<option value="">-- Time Mandante --</option>';
+      awaySelect.innerHTML = '<option value="">-- Time Visitante --</option>';
+
+      if (selectedLeague && LEAGUES[selectedLeague]) {
+        var teams = LEAGUES[selectedLeague];
+        for (var i = 0; i < teams.length; i++) {
+          var hOpt = document.createElement('option');
+          hOpt.value = teams[i];
+          hOpt.textContent = teams[i];
+          homeSelect.appendChild(hOpt);
+
+          var aOpt = document.createElement('option');
+          aOpt.value = teams[i];
+          aOpt.textContent = teams[i];
+          awaySelect.appendChild(aOpt);
+        }
+      }
+      updateEventFromSelection();
+    }
+
+    function updateEventFromSelection() {
+      if (!isSelectMode) return;
+
+      var home = document.getElementById('home-team-select').value;
+      var away = document.getElementById('away-team-select').value;
+      var eventInput = document.getElementById('bet-event');
+
+      if (home && away) {
+        eventInput.value = home + " vs " + away;
+      } else if (home) {
+        eventInput.value = home + " vs ...";
+      } else if (away) {
+        eventInput.value = "... vs " + away;
+      } else {
+        eventInput.value = "";
+      }
+    }
+
+    function setSelectMode(active) {
+      isSelectMode = active;
+      var selectorContainer = document.getElementById('selector-container');
+      var betEventInput = document.getElementById('bet-event');
+      var btnSelect = document.getElementById('btn-mode-select');
+      var btnManual = document.getElementById('btn-mode-manual');
+
+      if (active) {
+        selectorContainer.style.display = 'block';
+        betEventInput.readOnly = true;
+        btnSelect.classList.add('active');
+        btnManual.classList.remove('active');
+        updateEventFromSelection();
+      } else {
+        selectorContainer.style.display = 'none';
+        betEventInput.readOnly = false;
+        betEventInput.value = '';
+        btnSelect.classList.remove('active');
+        btnManual.classList.add('active');
+      }
+    }
+
+    function handleAddBet(e) {
+      e.preventDefault();
+
+      var eventInput = document.getElementById('bet-event').value.trim();
+      var marketInput = document.getElementById('bet-market').value.trim();
+      var oddInput = parseFloat(document.getElementById('bet-odd').value);
+      var stakeInput = parseFloat(document.getElementById('bet-stake').value);
+      var statusInput = document.getElementById('bet-status').value;
+      var dateInput = document.getElementById('bet-date').value;
+
+      if (!eventInput || !marketInput || isNaN(oddInput) || isNaN(stakeInput)) return;
+
+      var newBet = {
+        id: Date.now(),
+        date: dateInput,
+        event: eventInput,
+        market: marketInput,
+        odd: oddInput,
+        stake: stakeInput,
+        status: statusInput
+      };
+
+      bets.unshift(newBet);
+      safeStorageSave();
+      updateDashboard();
+      renderTable();
+
+      document.getElementById('bet-market').value = '';
+      document.getElementById('bet-odd').value = '';
+      document.getElementById('bet-stake').value = '';
+
+      if (isSelectMode) {
+        document.getElementById('league-select').value = '';
+        onLeagueChange();
+      } else {
+        document.getElementById('bet-event').value = '';
+      }
+    }
+
+    function deleteBet(id) {
+      bets = bets.filter(function(b) { return b.id !== id; });
+      safeStorageSave();
+      updateDashboard();
+      renderTable();
+    }
+
+    function openResetModal() {
+      document.getElementById('reset-modal').style.display = 'flex';
+    }
+
+    function closeResetModal() {
+      document.getElementById('reset-modal').style.display = 'none';
+    }
+
+    function executeReset() {
+      bets = [];
+      initialBankroll = 0.00;
+      currentFilter = 'ALL';
+
+      try {
+        localStorage.removeItem('gestor_greens_bets_v6');
+        localStorage.removeItem('gestor_greens_bankroll_v6');
+      } catch(e) {}
+
+      var form = document.getElementById('bet-form');
+      if (form) form.reset();
+      
+      var dateEl = document.getElementById('bet-date');
+      if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+
+      setSelectMode(true);
+      initLeagueOptions();
+
+      var filterBtns = document.querySelectorAll('.filter-btn');
+      filterBtns.forEach(function(b, idx) {
+        if (idx === 0) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      updateDashboard();
+      renderTable();
+      closeResetModal();
+    }
+
+    function filterBets(status, btn) {
+      currentFilter = status;
+      var filterBtns = document.querySelectorAll('.filter-btn');
+      filterBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      renderTable();
+    }
+
+    function openBankrollModal() {
+      document.getElementById('modal-bankroll-input').value = initialBankroll > 0 ? initialBankroll : '';
+      document.getElementById('bankroll-modal').style.display = 'flex';
+    }
+
+    function closeBankrollModal() {
+      document.getElementById('bankroll-modal').style.display = 'none';
+    }
+
+    function saveInitialBankroll() {
+      var val = parseFloat(document.getElementById('modal-bankroll-input').value);
+      initialBankroll = (!isNaN(val) && val >= 0) ? val : 0.00;
+      safeStorageSave();
+      updateDashboard();
+      closeBankrollModal();
+    }
+
+    function updateDashboard() {
+      var totalStaked = 0;
+      var totalReturned = 0;
+      var greens = 0;
+      var reds = 0;
+      var sumOdds = 0;
+      var settledBets = 0;
+
+      for (var i = 0; i < bets.length; i++) {
+        var b = bets[i];
+        var stake = parseFloat(b.stake) || 0;
+        var odd = parseFloat(b.odd) || 0;
+
+        if (b.status !== 'PENDING') {
+          totalStaked += stake;
+          sumOdds += odd;
+          settledBets++;
+        }
+
+        if (b.status === 'GREEN') {
+          totalReturned += (stake * odd);
+          greens++;
+        } else if (b.status === 'RED') {
+          reds++;
+        } else if (b.status === 'REFUND') {
+          totalReturned += stake;
+        }
+      }
+
+      var netProfit = totalReturned - totalStaked;
+      var totalBankrollCurrent = initialBankroll + netProfit;
+      
+      var bankrollGrowthPct = 0;
+      if (initialBankroll > 0) {
+        bankrollGrowthPct = (netProfit / initialBankroll) * 100;
+      }
+
+      var roi = 0;
+      if (totalStaked > 0) {
+        roi = (netProfit / totalStaked) * 100;
+      }
+
+      var winrate = 0;
+      if ((greens + reds) > 0) {
+        winrate = (greens / (greens + reds)) * 100;
+      }
+
+      var avgOdd = 0;
+      if (settledBets > 0) {
+        avgOdd = sumOdds / settledBets;
+      }
+
+      document.getElementById('display-initial-bankroll').textContent = fmtBRL(initialBankroll);
+      document.getElementById('display-total-bankroll').textContent = fmtBRL(totalBankrollCurrent);
+
+      var profitEl = document.getElementById('card-profit');
+      profitEl.textContent = (netProfit > 0 ? '+' : '') + fmtBRL(netProfit);
+      profitEl.className = 'value ' + (netProfit >= 0 ? 'green' : 'red');
+
+      var growthEl = document.getElementById('card-bankroll-growth');
+      growthEl.textContent = '🚀 Crescimento da Banca: ' + fmtPercent(bankrollGrowthPct);
+      growthEl.style.color = bankrollGrowthPct >= 0 ? 'var(--green-glow)' : 'var(--red-glow)';
+
+      document.getElementById('card-roi').textContent = fmtPercent(roi);
+      document.getElementById('card-staked-sub').textContent = 'Total Apostado: ' + fmtBRL(totalStaked);
+
+      document.getElementById('card-winrate').textContent = Math.round(winrate) + '%';
+      document.getElementById('card-greens-reds').textContent = greens + ' Greens / ' + reds + ' Reds';
+
+      document.getElementById('card-avg-odd').textContent = '@ ' + avgOdd.toFixed(2);
+      document.getElementById('card-total-bets').textContent = bets.length + ' apostas cadastradas';
+    }
+
+    function renderTable() {
+      var tbody = document.getElementById('bets-table-body');
+      tbody.innerHTML = '';
+
+      var filtered = [];
+      for (var i = 0; i < bets.length; i++) {
+        if (currentFilter === 'ALL' || bets[i].status === currentFilter) {
+          filtered.push(bets[i]);
+        }
+      }
+
+      var emptyState = document.getElementById('empty-state');
+      if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      } else {
+        emptyState.style.display = 'none';
+      }
+
+      for (var j = 0; j < filtered.length; j++) {
+        var b = filtered[j];
+        var returnVal = 0;
+        var profitVal = 0;
+        var profitPct = 0;
+        var badgeClass = '';
+        var badgeText = '';
+
+        var stake = parseFloat(b.stake) || 0;
+        var odd = parseFloat(b.odd) || 0;
+
+        if (b.status === 'GREEN') {
+          returnVal = stake * odd;
+          profitVal = returnVal - stake;
+          profitPct = (odd - 1) * 100;
+          badgeClass = 'badge green'; badgeText = 'GREEN';
+        } else if (b.status === 'RED') {
+          returnVal = 0;
+          profitVal = -stake;
+          profitPct = -100;
+          badgeClass = 'badge red'; badgeText = 'RED';
+        } else if (b.status === 'PENDING') {
+          badgeClass = 'badge pending'; badgeText = 'PENDENTE';
+        } else if (b.status === 'REFUND') {
+          returnVal = stake;
+          profitVal = 0;
+          profitPct = 0;
+          badgeClass = 'badge refund'; badgeText = 'ANULADA';
+        }
+
+        var dateFormatted = '-';
+        if (b.date) {
+          var parts = b.date.split('-');
+          if (parts.length === 3) {
+            dateFormatted = parts[2] + '/' + parts[1] + '/' + parts[0];
+          } else {
+            dateFormatted = b.date;
+          }
+        }
+
+        var profitText = '-';
+        var profitClass = '';
+        if (b.status !== 'PENDING') {
+          profitText = (profitVal > 0 ? '+' : '') + fmtBRL(profitVal);
+          profitClass = profitVal >= 0 ? 'green' : 'red';
+        }
+
+        var tr = document.createElement('tr');
+        tr.innerHTML = 
+          '<td>' + dateFormatted + '</td>' +
+          '<td><strong>' + b.event + '</strong><br><small style="color:var(--text-secondary);">' + b.market + '</small></td>' +
+          '<td>@ ' + parseFloat(b.odd).toFixed(2) + '</td>' +
+          '<td>' + fmtBRL(b.stake) + '</td>' +
+          '<td class="value ' + profitClass + '" style="font-size:0.825rem;">' + profitText + '</td>' +
+          '<td class="value ' + profitClass + '" style="font-size:0.825rem;">' + (b.status !== 'PENDING' ? fmtPercent(profitPct) : '-') + '</td>' +
+          '<td><span class="' + badgeClass + '">' + badgeText + '</span></td>' +
+          '<td><button class="btn-del" onclick="deleteBet(' + b.id + ')">🗑️</button></td>';
+
+        tbody.appendChild(tr);
+      }
+    }
+  </script>
+</body>
+</html>
