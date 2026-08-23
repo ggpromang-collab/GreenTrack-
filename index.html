@@ -1137,5 +1137,36 @@
       }
     }
   </script>
+<!-- BIBLIOTECA E CONEXÃO COM O BANCO DE DADOS (SUPABASE) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // Dados de conexão do seu projeto
+  const SUPABASE_URL = 'https://yssvgqwbzrnapwipzerf.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlzc3ZncXdia3JuYXB3aXB6ZXJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0ODkxOTUsImV4cCI6MjAyMzA2NTE1NX0.x0Gd-WYwKr2_XwGk5zCneomdPb6tm8h-HiV-jv2ADDvYs';
+
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Função para cadastrar novo usuário no banco
+  async function cadastrarUsuario(email, password) {
+    const { data, error } = await _supabase.auth.signUp({ email, password });
+    if (error) {
+      alert("Erro ao cadastrar: " + error.message);
+    } else {
+      alert("Cadastro realizado com sucesso! Agora você pode entrar.");
+    }
+  }
+
+  // Função para fazer login buscando no banco
+  async function realizarLogin(email, password) {
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert("Erro: E-mail ou senha incorretos.");
+    } else {
+      alert("Login efetuado com sucesso!");
+    }
+  }
+</script>
+
 </body>
 </html>
