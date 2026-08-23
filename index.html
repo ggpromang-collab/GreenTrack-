@@ -685,7 +685,7 @@
       } else {
         const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
         if (error) {
-          alert("E-mail ou senha incorretos!");
+          alert("Erro no login: " + error.message);
         } else {
           localStorage.setItem('gestor_greens_user', email);
           checkAuth();
