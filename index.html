@@ -1179,22 +1179,32 @@ async function updateBetStatus(id, newStatus) {
 
         var dateFormatted = b.date ? b.date.split('-').reverse().join('/') : '';
 
-        tr.innerHTML = 
-          '<td>' + dateFormatted + '</td>' +
-          '<td><strong>' + b.event + '</strong><br><small style="color:var(--text-secondary);">' + b.market + '</small></td>' +
-          '<td>@ ' + parseFloat(b.odd).toFixed(2) + '</td>' +
-          '<td>' + fmtBRL(b.stake) + '</td>' +
-          '<td style="color:' + (profitVal > 0 ? 'var(--green-glow)' : (profitVal < 0 ? 'var(--red-glow)' : 'inherit')) + ';">' + fmtBRL(profitVal) + '</td>' +
-          '<td style="color:' + (profitPct > 0 ? 'var(--green-glow)' : (profitPct < 0 ? 'var(--red-glow)' : 'inherit')) + ';">' + (b.status === 'PENDING' || b.status === 'REFUND' ? '-' : fmtPercent(profitPct)) + '</td>' +
-          '<td>' +
-            '<select onchange="updateBetStatus(' + b.id + ', this.value)" style="background:var(--input-bg); color:var(--text-primary); border:1px solid var(--card-border); padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">' +
-              '<option value="PENDING"' + (b.status === 'PENDING' ? ' selected' : '') + '>🟡 PENDENTE</option>' +
-              '<option value="GREEN"' + (b.status === 'GREEN' ? ' selected' : '') + '>🟢 GREEN</option>' +
-              '<option value="RED"' + (b.status === 'RED' ? ' selected' : '') + '>🔴 RED</option>' +
-              '<option value="REFUND"' + (b.status === 'REFUND' ? ' selected' : '') + '>⚪ ANULADA</option>' +
-            '</select>' +
-          '</td>' +
-          '<td><button class="btn-del" onclick="deleteBet(' + b.id + ')" title="Excluir">🗑️</button></td>';
+        // Define a exibição do status (Select se for Pendente, texto fixo se já finalizou)
+var statusHtml = '';
+if (b.status === 'PENDING') {
+  statusHtml = '<select onchange="updateBetStatus(' + b.id + ', this.value)" style="background:var(--input-bg); color:var(--text-primary); border:1px solid var(--card-border); padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">' +
+    '<option value="PENDING" selected>🟡 PENDENTE</option>' +
+    '<option value="GREEN">🟢 GREEN</option>' +
+    '<option value="RED">🔴 RED</option>' +
+    '<option value="REFUND">⚪ ANULADA</option>' +
+  '</select>';
+} else if (b.status === 'GREEN') {
+  statusHtml = '<span style="color:var(--green-glow); font-weight:700;">🟢 GREEN</span>';
+} else if (b.status === 'RED') {
+  statusHtml = '<span style="color:var(--red-glow); font-weight:700;">🔴 RED</span>';
+} else {
+  statusHtml = '<span style="color:var(--text-secondary); font-weight:700;">⚪ ANULADA</span>';
+}
+
+tr.innerHTML = 
+  '<td>' + dateFormatted + '</td>' +
+  '<td><strong>' + b.event + '</strong><br><small style="color:var(--text-secondary);">' + b.market + '</small></td>' +
+  '<td>@ ' + parseFloat(b.odd).toFixed(2) + '</td>' +
+  '<td>' + fmtBRL(b.stake) + '</td>' +
+  '<td style="color:' + (profitVal > 0 ? 'var(--green-glow)' : (profitVal < 0 ? 'var(--red-glow)' : 'inherit')) + ';">' + fmtBRL(profitVal) + '</td>' +
+  '<td style="color:' + (profitPct > 0 ? 'var(--green-glow)' : (profitPct < 0 ? 'var(--red-glow)' : 'inherit')) + ';">' + (b.status === 'PENDING' || b.status === 'REFUND' ? '-' : fmtPercent(profitPct)) + '</td>' +
+  '<td>' + statusHtml + '</td>' +
+  '<td><button class="btn-del" onclick="deleteBet(' + b.id + ')" title="Excluir">🗑️</button></td>';
 
         tbody.appendChild(tr);
       }
