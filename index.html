@@ -1123,18 +1123,35 @@
       document.getElementById('card-total-bets').textContent = bets.length + ' apostas cadastradas';
     }
 
+async function updateBetStatus(id, newStatus) {
+      var bet = bets.find(function(b) { return b.id === id; });
+      if (!bet) return;
+
+      bet.status = newStatus;
+
+      safeStorageSave();
+      updateDashboard();
+      renderTable();
+
+      try {
+        if (typeof _supabase !== 'undefined') {
+          await _supabase.from('bets').update({ status: newStatus }).eq('id', id);
+        }
+      } catch (err) {
+        console.log("Erro ao atualizar no Supabase:", err);
+      }
+    }
+
     function renderTable() {
       var tbody = document.getElementById('bets-table-body');
+      var emptyState = document.getElementById('empty-state');
       tbody.innerHTML = '';
 
-      var filtered = [];
-      for (var i = 0; i < bets.length; i++) {
-        if (currentFilter === 'ALL' || bets[i].status === currentFilter) {
-          filtered.push(bets[i]);
-        }
-      }
+      var filtered = bets.filter(function(b) {
+        if (currentFilter === 'ALL') return true;
+        return b.status === currentFilter;
+      });
 
-      var emptyState = document.getElementById('empty-state');
       if (filtered.length === 0) {
         emptyState.style.display = 'block';
         return;
@@ -1142,63 +1159,42 @@
         emptyState.style.display = 'none';
       }
 
-      for (var j = 0; j < filtered.length; j++) {
-        var b = filtered[j];
-        var returnVal = 0;
+      for (var i = 0; i < filtered.length; i++) {
+        var b = filtered[i];
+        var tr = document.createElement('tr');
+
         var profitVal = 0;
         var profitPct = 0;
-        var badgeClass = '';
-        var badgeText = '';
-
-        var stake = parseFloat(b.stake) || 0;
-        var odd = parseFloat(b.odd) || 0;
 
         if (b.status === 'GREEN') {
-          returnVal = stake * odd;
-          profitVal = returnVal - stake;
-          profitPct = (odd - 1) * 100;
-          badgeClass = 'badge green'; badgeText = 'GREEN';
+          profitVal = (b.stake * b.odd) - b.stake;
+          profitPct = ((b.odd - 1) * 100);
         } else if (b.status === 'RED') {
-          returnVal = 0;
-          profitVal = -stake;
+          profitVal = -b.stake;
           profitPct = -100;
-          badgeClass = 'badge red'; badgeText = 'RED';
-        } else if (b.status === 'PENDING') {
-          badgeClass = 'badge pending'; badgeText = 'PENDENTE';
-        } else if (b.status === 'REFUND') {
-          returnVal = stake;
+        } else if (b.status === 'PENDING' || b.status === 'REFUND') {
           profitVal = 0;
           profitPct = 0;
-          badgeClass = 'badge refund'; badgeText = 'ANULADA';
         }
 
-        var dateFormatted = '-';
-        if (b.date) {
-          var parts = b.date.split('-');
-          if (parts.length === 3) {
-            dateFormatted = parts[2] + '/' + parts[1] + '/' + parts[0];
-          } else {
-            dateFormatted = b.date;
-          }
-        }
+        var dateFormatted = b.date ? b.date.split('-').reverse().join('/') : '';
 
-        var profitText = '-';
-        var profitClass = '';
-        if (b.status !== 'PENDING') {
-          profitText = (profitVal > 0 ? '+' : '') + fmtBRL(profitVal);
-          profitClass = profitVal >= 0 ? 'green' : 'red';
-        }
-
-        var tr = document.createElement('tr');
         tr.innerHTML = 
           '<td>' + dateFormatted + '</td>' +
           '<td><strong>' + b.event + '</strong><br><small style="color:var(--text-secondary);">' + b.market + '</small></td>' +
           '<td>@ ' + parseFloat(b.odd).toFixed(2) + '</td>' +
           '<td>' + fmtBRL(b.stake) + '</td>' +
-          '<td class="value ' + profitClass + '" style="font-size:0.825rem;">' + profitText + '</td>' +
-          '<td class="value ' + profitClass + '" style="font-size:0.825rem;">' + (b.status !== 'PENDING' ? fmtPercent(profitPct) : '-') + '</td>' +
-          '<td><span class="' + badgeClass + '">' + badgeText + '</span></td>' +
-          '<td><button class="btn-del" onclick="deleteBet(' + b.id + ')">🗑️</button></td>';
+          '<td style="color:' + (profitVal > 0 ? 'var(--green-glow)' : (profitVal < 0 ? 'var(--red-glow)' : 'inherit')) + ';">' + fmtBRL(profitVal) + '</td>' +
+          '<td style="color:' + (profitPct > 0 ? 'var(--green-glow)' : (profitPct < 0 ? 'var(--red-glow)' : 'inherit')) + ';">' + (b.status === 'PENDING' || b.status === 'REFUND' ? '-' : fmtPercent(profitPct)) + '</td>' +
+          '<td>' +
+            '<select onchange="updateBetStatus(' + b.id + ', this.value)" style="background:var(--input-bg); color:var(--text-primary); border:1px solid var(--card-border); padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">' +
+              '<option value="PENDING"' + (b.status === 'PENDING' ? ' selected' : '') + '>🟡 PENDENTE</option>' +
+              '<option value="GREEN"' + (b.status === 'GREEN' ? ' selected' : '') + '>🟢 GREEN</option>' +
+              '<option value="RED"' + (b.status === 'RED' ? ' selected' : '') + '>🔴 RED</option>' +
+              '<option value="REFUND"' + (b.status === 'REFUND' ? ' selected' : '') + '>⚪ ANULADA</option>' +
+            '</select>' +
+          '</td>' +
+          '<td><button class="btn-del" onclick="deleteBet(' + b.id + ')" title="Excluir">🗑️</button></td>';
 
         tbody.appendChild(tr);
       }
