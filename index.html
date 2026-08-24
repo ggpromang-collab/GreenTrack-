@@ -604,31 +604,99 @@
 
   <script>
     var LEAGUES = {
-      "🇧🇷 Brasileirão Série A (2026)": [
-        "Athletico-PR", "Atlético-MG", "Bahia", "Botafogo", "Ceará",
-        "Corinthians", "Cruzeiro", "Flamengo", "Fluminense", "Fortaleza",
-        "Grêmio", "Internacional", "Juventude", "Mirassol", "Palmeiras",
-        "Red Bull Bragantino", "Santos", "São Paulo", "Sport", "Vasco da Gama"
-      ],
-      "🇪🇸 La Liga (Espanha)": [
-        "Alavés", "Athletic Bilbao", "Atlético de Madrid", "Barcelona", "Celta de Vigo",
-        "Espanyol", "Getafe", "Girona", "Las Palmas", "Leganés",
-        "Mallorca", "Osasuna", "Rayo Vallecano", "Real Betis", "Real Madrid",
-        "Real Sociedad", "Sevilla", "Valencia", "Valladolid", "Villarreal"
-      ],
-      "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League (Inglaterra)": [
-        "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
-        "Chelsea", "Crystal Palace", "Everton", "Fulham", "Ipswich Town",
-        "Leicester City", "Liverpool", "Manchester City", "Manchester United", "Newcastle United",
-        "Nottingham Forest", "Southampton", "Tottenham Hotspur", "West Ham", "Wolverhampton"
-      ],
-      "🇮🇹 Serie A (Itália)": [
-        "Atalanta", "Bologna", "Cagliari", "Como", "Empoli",
-        "Fiorentina", "Genoa", "Inter de Milão", "Juventus", "Lazio",
-        "Lecce", "Milan", "Monza", "Napoli", "Parma",
-        "Roma", "Torino", "Udinese", "Venezia", "Verona"
-      ]
-    };
+  "🇧🇷 Brasileirão Série A (2026)": [
+    "Athletico-PR", "Atlético-MG", "Bahia", "Botafogo", "Chapecoense",
+    "Corinthians", "Coritiba", "Cruzeiro", "Flamengo", "Fluminense",
+    "Grêmio", "Internacional", "Mirassol", "Palmeiras",
+    "Red Bull Bragantino", "Remo", "Santos", "São Paulo",
+    "Vasco da Gama", "Vitória"
+  ],
+
+  "🇧🇷 Brasileirão Série B (2026)": [
+    "América-MG", "Athletic-MG", "Atlético-GO", "Avaí", "Botafogo-SP",
+    "Ceará", "CRB", "Criciúma", "Cuiabá", "Fortaleza",
+    "Goiás", "Juventude", "Londrina", "Náutico", "Novorizontino",
+    "Operário-PR", "Ponte Preta", "São Bernardo", "Sport", "Vila Nova"
+  ],
+
+  "🇪🇸 La Liga (Espanha 2026/27)": [
+    "Alavés", "Athletic Bilbao", "Atlético de Madrid", "Barcelona",
+    "Celta de Vigo", "Elche", "Espanyol", "Getafe", "Levante",
+    "Málaga", "Racing Santander", "Rayo Vallecano", "Deportivo La Coruña",
+    "Osasuna", "Real Betis", "Real Madrid", "Real Sociedad",
+    "Sevilla", "Valencia", "Villarreal"
+  ],
+
+  "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League (Inglaterra 2026/27)": [
+    "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
+    "Chelsea", "Coventry City", "Crystal Palace", "Everton", "Fulham",
+    "Hull City", "Ipswich Town", "Leeds United", "Liverpool",
+    "Manchester City", "Manchester United", "Newcastle United",
+    "Nottingham Forest", "Sunderland", "Tottenham Hotspur"
+  ],
+
+  "🇮🇹 Serie A (Itália 2026/27)": [
+    "Atalanta", "Bologna", "Cagliari", "Como", "Fiorentina",
+    "Frosinone", "Genoa", "Inter de Milão", "Juventus", "Lazio",
+    "Lecce", "Milan", "Monza", "Napoli", "Parma",
+    "Roma", "Sassuolo", "Torino", "Udinese", "Venezia"
+  ],
+
+  "🇩🇪 Bundesliga (Alemanha 2026/27)": [
+    "Bayern de Munique", "Borussia Dortmund", "RB Leipzig",
+    "VfB Stuttgart", "Hoffenheim", "Bayer Leverkusen",
+    "Freiburg", "Eintracht Frankfurt", "Augsburg", "Mainz 05",
+    "Union Berlin", "Borussia Mönchengladbach", "Hamburgo",
+    "Colônia", "Werder Bremen", "Schalke 04", "Elversberg",
+    "Paderborn"
+  ],
+
+  "🇫🇷 Ligue 1 (França 2026/27)": [
+    "Angers", "Auxerre", "Brest", "Le Havre", "Le Mans",
+    "Lens", "Lorient", "Lille", "Olympique Lyonnais",
+    "Olympique de Marseille", "AS Monaco", "OGC Nice",
+    "Paris FC", "Paris Saint-Germain", "Rennes",
+    "Strasbourg", "Toulouse", "Troyes"
+  ],
+
+  "🇵🇹 Primeira Liga (Portugal 2026/27)": [
+    "Alverca", "Arouca", "Benfica", "Braga", "Casa Pia",
+    "Estoril", "Estrela Amadora", "FC Porto", "Famalicão",
+    "Gil Vicente", "Marítimo", "Moreirense", "Nacional",
+    "Rio Ave", "Santa Clara", "Sporting CP",
+    "Tondela", "Vitória de Guimarães"
+  ],
+
+  "🇳🇱 Eredivisie (Holanda 2026/27)": [
+    "ADO Den Haag", "Ajax", "AZ Alkmaar", "Excelsior",
+    "Feyenoord", "Fortuna Sittard", "Go Ahead Eagles",
+    "FC Groningen", "FC Twente", "FC Utrecht", "NEC Nijmegen",
+    "PEC Zwolle", "PSV Eindhoven", "SC Cambuur",
+    "SC Heerenveen", "Sparta Rotterdam", "Telstar", "Willem II"
+  ],
+
+  "🇧🇪 Pro League (Bélgica 2026/27)": [
+    "Anderlecht", "Antwerp", "Cercle Brugge", "Charleroi",
+    "Club Brugge", "Genk", "Gent", "Kortrijk", "Lommel",
+    "Mechelen", "OH Leuven", "RAAL La Louvière", "SK Beveren",
+    "Sint-Truiden", "Standard Liège", "Union Saint-Gilloise",
+    "Westerlo", "Zulte Waregem"
+  ],
+
+  "🇹🇷 Süper Lig (Turquia 2026/27)": [
+    "Alanyaspor", "Amed Sportif Faaliyetler", "Antalyaspor",
+    "Beşiktaş", "Çaykur Rizespor", "Çorum FK", "Eyüpspor",
+    "Fenerbahçe", "Galatasaray", "Gaziantep FK", "Gençlerbirliği",
+    "Göztepe", "İstanbul Başakşehir", "Kasımpaşa", "Kayserispor",
+    "Kocaelispor", "Konyaspor", "Samsunspor", "Trabzonspor"
+  ],
+
+  "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scottish Premiership (Escócia 2026/27)": [
+    "Aberdeen", "Celtic", "Dundee FC", "Dundee United",
+    "Falkirk", "Heart of Midlothian", "Hibernian", "Kilmarnock",
+    "Motherwell", "Rangers", "St. Johnstone", "St. Mirren"
+  ]
+};
 
     var initialBankroll = 0.00;
     var bets = [];
