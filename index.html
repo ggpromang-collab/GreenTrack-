@@ -601,6 +601,67 @@
       </div>
     </div>
   </div>
+  <!-- MODAL DE COMPARTILHAMENTO -->
+<div class="modal-overlay" id="share-bet-modal" style="display:none;">
+  <div class="modal">
+    <h3>📤 Compartilhar aposta</h3>
+
+    <p style="font-size:14px;color:#888;">
+      Envie este link para seu amigo adicionar a aposta à conta dele.
+    </p>
+
+    <input
+      type="text"
+      id="share-bet-link"
+      readonly
+      style="width:100%;margin:10px 0;padding:12px;"
+    >
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn" onclick="copyBetLink()">
+        📋 Copiar link
+      </button>
+
+      <button class="btn btn-primary" onclick="nativeShareBet()">
+        📤 Compartilhar
+      </button>
+    </div>
+
+    <button
+      class="btn"
+      onclick="closeShareBetModal()"
+      style="margin-top:10px;width:100%;"
+    >
+      Fechar
+    </button>
+  </div>
+</div>
+
+
+<!-- MODAL PARA QUEM RECEBEU O LINK -->
+<div class="modal-overlay" id="import-shared-bet-modal" style="display:none;">
+  <div class="modal">
+    <h3>📥 Aposta compartilhada</h3>
+
+    <div id="shared-bet-preview"></div>
+
+    <button
+      class="btn btn-primary"
+      onclick="addSharedBetToAccount()"
+      style="width:100%;margin-top:15px;"
+    >
+      ➕ Adicionar à minha conta
+    </button>
+
+    <button
+      class="btn"
+      onclick="closeSharedImportModal()"
+      style="width:100%;margin-top:10px;"
+    >
+      Cancelar
+    </button>
+  </div>
+</div>
 
   <script>
     var LEAGUES = {
