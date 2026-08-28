@@ -1318,6 +1318,247 @@ tr.innerHTML =
         tbody.appendChild(tr);
       }
     }
+    // ==========================================
+// COMPARTILHAR APOSTA POR LINK
+// ==========================================
+
+var sharedBetToImport = null;
+
+
+// Gera o link da aposta
+function generateBetShareLink(bet) {
+
+  var data = {
+    date: bet.date,
+    event: bet.event,
+    market: bet.market,
+    odd: bet.odd,
+    stake: bet.stake,
+    status: bet.status
+  };
+
+  var encoded = btoa(
+    unescape(
+      encodeURIComponent(JSON.stringify(data))
+    )
+  );
+
+  return window.location.origin +
+    window.location.pathname +
+    "?sharedBet=" +
+    encodeURIComponent(encoded);
+}
+
+
+// Abre o compartilhamento
+function openShareBet(id) {
+
+  var bet = bets.find(function(b) {
+    return String(b.id) === String(id);
+  });
+
+  if (!bet) return;
+
+  var link = generateBetShareLink(bet);
+
+  document.getElementById("share-bet-link").value = link;
+
+  document.getElementById("share-bet-modal").style.display = "flex";
+}
+
+
+// Copiar link
+async function copyBetLink() {
+
+  var input = document.getElementById("share-bet-link");
+
+  try {
+
+    await navigator.clipboard.writeText(input.value);
+
+    alert("✅ Link copiado!");
+
+  } catch (e) {
+
+    input.select();
+    document.execCommand("copy");
+
+    alert("✅ Link copiado!");
+
+  }
+}
+
+
+// Compartilhamento nativo do iPhone
+async function nativeShareBet() {
+
+  var link = document.getElementById("share-bet-link").value;
+
+  if (navigator.share) {
+
+    try {
+
+      await navigator.share({
+        title: "Aposta compartilhada",
+        text: "📊 Confira minha aposta no Gestor de Greens:",
+        url: link
+      });
+
+    } catch (e) {}
+
+  } else {
+
+    copyBetLink();
+
+  }
+}
+
+
+// Fecha modal
+function closeShareBetModal() {
+
+  document.getElementById("share-bet-modal").style.display = "none";
+
+}
+
+
+// ==========================================
+// RECEBER APOSTA PELO LINK
+// ==========================================
+
+function checkSharedBet() {
+
+  var params = new URLSearchParams(window.location.search);
+
+  var shared = params.get("sharedBet");
+
+  if (!shared) return;
+
+  try {
+
+    var decoded = decodeURIComponent(shared);
+
+    var json = decodeURIComponent(
+      escape(atob(decoded))
+    );
+
+    sharedBetToImport = JSON.parse(json);
+
+    showSharedBetPreview();
+
+  } catch (e) {
+
+    console.error("Erro ao carregar aposta compartilhada:", e);
+
+  }
+}
+
+
+// Mostra a aposta recebida
+function showSharedBetPreview() {
+
+  if (!sharedBetToImport) return;
+
+  var bet = sharedBetToImport;
+
+  document.getElementById("shared-bet-preview").innerHTML = `
+    <div style="
+      padding:15px;
+      border-radius:12px;
+      background:var(--input-bg);
+      margin-top:10px;
+    ">
+
+      <strong>⚽ ${bet.event}</strong>
+
+      <br><br>
+
+      🎯 Seleção: ${bet.market}
+
+      <br>
+
+      📈 Odd: ${Number(bet.odd).toFixed(2)}
+
+      <br>
+
+      💰 Entrada: ${fmtBRL(bet.stake)}
+
+      <br>
+
+      📅 Data: ${bet.date}
+
+    </div>
+  `;
+
+  document.getElementById(
+    "import-shared-bet-modal"
+  ).style.display = "flex";
+}
+
+
+// Adiciona a aposta na conta
+function addSharedBetToAccount() {
+
+  if (!sharedBetToImport) return;
+
+  var newBet = {
+
+    id: Date.now(),
+
+    date: sharedBetToImport.date,
+
+    event: sharedBetToImport.event,
+
+    market: sharedBetToImport.market,
+
+    odd: Number(sharedBetToImport.odd),
+
+    stake: Number(sharedBetToImport.stake),
+
+    status: sharedBetToImport.status || "PENDING"
+
+  };
+
+  bets.unshift(newBet);
+
+  safeStorageSave();
+
+  updateDashboard();
+
+  renderTable();
+
+  alert("✅ Aposta adicionada à sua conta!");
+
+  closeSharedImportModal();
+
+  // Remove o código da URL
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+  sharedBetToImport = null;
+}
+
+
+// Fecha importação
+function closeSharedImportModal() {
+
+  document.getElementById(
+    "import-shared-bet-modal"
+  ).style.display = "none";
+}
+
+
+// Verifica se existe aposta compartilhada
+document.addEventListener("DOMContentLoaded", function() {
+
+  setTimeout(function() {
+    checkSharedBet();
+  }, 500);
+
+});
   </script>
 <!-- BIBLIOTECA E CONEXÃO COM O BANCO DE DADOS (SUPABASE) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
